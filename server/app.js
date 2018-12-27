@@ -9,12 +9,19 @@ const app = express();
 //Middleware
 app.use(bodyParser.json());
 app.use(cors());
+// // error handling middleware
+// app.use(function(err,callback){
+
+// });
 
 // Passport config 
 require('./conf/passport')(passport);
  
-const posts = require('./api/posts');
-app.use('/api/posts',posts);
+const shops = require('./api/shops');
+app.use('/api/shops',shops);
+
+const users = require('./api/users');
+app.use('/api/users',users);
 
 const port = process.env.PORT || 2000;
 

@@ -1,25 +1,33 @@
 var mongodb = require("mongodb");
-var GeoJSON = require("geojson");
 var ObjectId = require("mongodb").ObjectID;
 var assert = require("assert");
 
 // Database Name
 const dbName = "shops";
 
+//count shops  a string or without
 exports.countShops = async function(name, callback) {
-  const Collection = await GetCollection("shops");
-  if (name == "") {
-    await Collection.count().then(rep => callback(rep));
-  } else {
-    let query = {
-      name: { $regex: ".*" + name + ".*", $options: "i" }
+  try {
+    const Collection = await GetCollection("shops");
+    if (name == "") {
+      await Collection.count().then(rep => callback(rep));
+    } else {
+      let query = {
+        name: { $regex: ".*" + name + ".*", $options: "i" }
+      };
+      await Collection.find(query).count().then(rep => callback(rep));
+    }
+  } catch (err) {
+    reponse = {
+      error: err.message,
+      msg: "erreur lors du find"
     };
-    await Collection.find(query)
-      .count()
-      .then(rep => callback(rep));
+    callback(reponse);
   }
 };
 
+//finding shops including a string or without
+//fixing a number of shops per page 
 exports.findShops = async function(page, pagesize, name, callback) {
   const Collection = await GetCollection("shops");
 
@@ -46,70 +54,33 @@ exports.findShops = async function(page, pagesize, name, callback) {
       });
   }
 };
+
+//finding shops near the coord
 exports.findShopsNear = async function(coord, callback) {
   let reponse;
   const Collection = await GetCollection("shops");
-  await Collection.aggregate(
-    [
-      {
-        $geoNear: {
-          near: {
-            type: "Point",
-            coordinates: [parseFloat(coord.lng), parseFloat(coord.lat)]
-          },
-          spherical: true,
-          
-          distanceField: "dist",
-          maxDistance: 100000
-        }
+  await Collection.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: "Point",
+          coordinates: [parseFloat(coord.lng), parseFloat(coord.lat)]
+        },
+        spherical: true,
+
+        distanceField: "dist",
+        maxDistance: 100000
       }
-    ]).get((err, data) => {
-      if (!err) {
-        // cursor.get(function(data) {
-          reponse = {
-            succes: true,
-            shops: data,
-            error: null,
-            msg: "Details du magasin pres envoyés"
-          };
-          callback(reponse);
-        // }
-        // );
-      } else {
-        reponse = {
-          succes: false,
-          shops: null,
-          error: err,
-          msg: "erreur lors du find"
-        };
-        callback(reponse);
-      }
-    });
-    // await Collection.geoNear(
-    //   {
-    //     type: "Point",
-    //     coordinates: [parseFloat(coord.lng), parseFloat(coord.lat)]
-    //   },
-    //   { maxDistance: 100000, spherical: true }
-    // )
-    
-
-};
-exports.findShopById = async function(id, callback) {
-  const Collection = await GetCollection("shops");
-
-  let myquery = { _id: ObjectId(id) };
-
-  await Collection.findOne(myquery, function(err, data) {
-    let reponse;
-
+    }
+  ]).get((err, data) => {
     if (!err) {
       reponse = {
         succes: true,
         shops: data,
         error: null,
-        msg: "Details du magasin envoyés"
+        msg: "Details du magasin pres envoyés"
       };
+      callback(reponse);
     } else {
       reponse = {
         succes: false,
@@ -117,9 +88,41 @@ exports.findShopById = async function(id, callback) {
         error: err,
         msg: "erreur lors du find"
       };
+      callback(reponse);
     }
-    callback(reponse);
   });
+};
+
+//finding shops by id
+exports.findShopById = async function(id, callback) {
+  try {
+    const Collection = await GetCollection("shops");
+    let myquery = { _id: ObjectId(id) };
+
+    await Collection.findOne(myquery, function(err, data) {
+      let reponse;
+      //if the find dosen't return a results, it's not an err, so we need to test on data availability
+      if (data) {
+        reponse = {
+          shops: data,
+          error: null,
+          msg: "Details du magasin envoyés"
+        };
+      } else {
+        reponse = {
+          error: err,
+          msg: "aucun element trouver"
+        };
+      }
+      callback(reponse);
+    });
+  } catch (err) {
+    reponse = {
+      error: err.message,
+      msg: "erreur lors du find"
+    };
+    callback(reponse);
+  }
 };
 
 exports.createShop = async function(formData, callback) {
@@ -241,6 +244,8 @@ exports.deleteShop = async function(id, callback) {
     callback(reponse);
   }
 };
+
+
 
 async function GetCollection(name) {
   const client = await mongodb.MongoClient.connect(
