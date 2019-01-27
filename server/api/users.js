@@ -34,9 +34,9 @@ router.post("/singup", function(req, res) {
 router.post("/singin", function(req, res, next) {
   passport.authenticate("local", function(err, user, info) {
     if (info) {
-      res.send(JSON.stringify({ data: info.message }));
+      res.send(JSON.stringify({ err: info.message }));
     } else {
-      res.send(JSON.stringify({ data: "connected" }));
+      res.send(JSON.stringify({ data: "connected" , user : user }));
     }
     // failureRedirect: '/auth/mail',
     // failureFlash: true,
@@ -103,22 +103,22 @@ router.get('/liked', function(req, res) {
 });
 
 
-// Get near shops unliked
-router.get("/nearunliked", async (req, res) => {
-  // Si présent on prend la valeur du param, sinon 1
-  let coord = {
-    lng : req.query.lng  ,
-    lat : req.query.lat 
-  } ;
-  var iduser = req.query.iduser;
- 
-  userCRUD.findShopunlikedNear(coord,iduser, function(data) {
-    res.send(JSON.stringify(data)); 
-  });
-});
 
-// Get near not disliked shops unliked
-router.get("/nearnotdisliked", async (req, res) => {
+// router.get("/nearunliked", async (req, res) => {
+//   // Si présent on prend la valeur du param, sinon 1
+//   let coord = {
+//     lng : req.query.lng  ,
+//     lat : req.query.lat 
+//   } ;
+//   var iduser = req.query.iduser;
+ 
+//   userCRUD.findShopunlikedNear(coord,iduser, function(data) {
+//     res.send(JSON.stringify(data)); 
+//   });
+// });
+
+// Get near shops not disliked, unliked
+router.get("/near", async (req, res) => {
   // Si présent on prend la valeur du param, sinon 1
   let coord = {
     lng : req.query.lng  ,
@@ -126,8 +126,12 @@ router.get("/nearnotdisliked", async (req, res) => {
   } ;
   var iduser = req.query.iduser;
  
-  userCRUD.findShopunlikedNearNOTdisliked(coord,iduser, function(data) {
-    res.send(JSON.stringify(data)); 
+  userCRUD.findShopsHome(coord,iduser, function(data) {
+    var objdData = {
+      msg: "shops pres recherchés avec succès",
+      data: data
+    };
+    res.send(JSON.stringify(objdData));
   });
 });
 

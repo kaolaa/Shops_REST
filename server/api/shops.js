@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
   // Si présent on prend la valeur du param, sinon 1
   let page = parseInt(req.query.page || 1);
   // idem si present on prend la valeur, sinon 10
-  let pagesize = parseInt(req.query.pagesize || 10);
+  let pagesize = parseInt(req.query.pagesize || 12);
 
   let name = req.query.name || "";
 
@@ -42,7 +42,7 @@ router.get("/", async (req, res) => {
 });
 
 //  get shops per id 
-router.get('id/:id', function(req, res) {
+router.get("/id/:id", function(req, res) {
 	var id = req.params.id;
 
  	shopCRUD.findShopById(id, function(data) {

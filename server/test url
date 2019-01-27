@@ -1,0 +1,23 @@
+/***************************** Shops *************************/
+//get all shops 
+http://localhost:2000/api/shops
+//near shops 
+http://localhost:2000/api/shops/near?lng=-6.79309&lat=33.98909
+
+/***************************** Users *************************/
+//login
+http://localhost:2000/api/users/singin
+{
+ "email" : "khatrach@gmail.cm",
+"password" : "159734862"
+}
+//like
+http://localhost:2000/api/users/like?iduser=5c48d17e3443b016ac113aff&idshop=5a0c6bd5fd3eb67969316dee
+
+//nearunliked_notdisliked_for2h
+
+
+http://localhost:2000/api/users/near?iduser=5c1fabedea128e363cd32195&lng=-6.79309&lat=33.98909
+
+//liked
+http://localhost:2000/api/users/liked?iduser=5c1fabedea128e363cd32195

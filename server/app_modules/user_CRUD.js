@@ -1,29 +1,23 @@
 const bcrypt = require("bcryptjs");
-const passport = require("passport");
-const key = require("../conf/key");
-const mongodb = require("mongodb");
 var ObjectId = require("mongodb").ObjectID;
-
-var assert = require("assert");
-
+var MongoClient = require("mongodb").MongoClient;
 //Data base
 const dbName = "shops";
+const url = "mongodb://kaolaa:kaola77@ds141924.mlab.com:41924/shops";
 
 //finding user by id
 exports.findUserById = async function(id, callback) {
-  const Collection = await GetCollection("users");
-
-  await Collection.findOne({ _id: id }, function(err, data) {
-    let reponse;
-    if (!err) {
-      callback(data);
-    } else {
-      reponse = {
-        error: err,
-        msg: "error"
-      };
-    }
-    callback(reponse);
+  MongoClient.connect(url).then(client => {
+    client
+      .db(dbName)
+      .collection("users")
+      .findOne({ _id: id })
+      .then(results => {
+        callback(results);
+      })
+      .catch(err => {
+        throw err;
+      });
   });
 };
 
@@ -41,331 +35,214 @@ exports.createUser = async function(formData, callback) {
   //     };
   //   } else {
 
-  const Collection = await GetCollection("users");
-
-  await Collection.findOne({ email: formData.email }).then(user => {
-    let reponse;
-    if (user) {
-      reponse = {
-        succes: false,
-        msg: "Email déja utilisé"
-      };
-      callback(reponse);
-    } else {
-      const newUser = {
-        FirstName: formData.nom,
-        LastName: formData.prenom,
-        email: formData.email,
-        password: formData.password
-      };
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-
-          Collection.insertOne(newUser, function(err, inserted) {
-            if (!err) {
-              callback("Ajout réussi " + inserted.ops[0]._id);
-            } else {
-              reponse = {
-                error: err,
-                msg: "Problème à l'insertion"
-              };
-              callback(reponse);
-            }
-          });
+  MongoClient.connect(url)
+    .then(client => {
+      client
+        .db(dbName)
+        .collection("users")
+        .findOne({ email: formData.email })
+        .then(user => {
+          if (user) {
+            callback({ err: "Email déja utilisé" });
+          } else {
+            const newUser = {
+              FirstName: formData.Firstname,
+              LastName: formData.Lastname,
+              email: formData.email,
+              password: formData.password
+            };
+            bcrypt.genSalt(10).then(salt => {
+              bcrypt.hash(newUser.password, salt).then(hash => {
+                newUser.password = hash;
+                client
+                  .db(dbName)
+                  .collection("users")
+                  .insertOne(newUser)
+                  .then(inserted => {
+                    callback({ data: "Ajout réussi " + inserted.ops[0]._id });
+                  });
+              });
+            });
+          }
         });
-      });
-    }
-  });
+    })
+    .catch(err => {
+      throw err;
+    });
 };
 
 /********************************* SHOPS *************************************/
 
 //liking a shop
 exports.likeShop = async function(iduser, idshop, callback) {
-  const Collection = await GetCollection("users");
-  if (Collection) {
-    await Collection.update(
-      { _id: ObjectId(iduser) },
-      {
-        $addToSet: {
-          likedShops: {
-            idShop: idshop
+  MongoClient.connect(url).then(client => {
+    client
+      .db(dbName)
+      .collection("users")
+      .update(
+        { _id: ObjectId(iduser) },
+        {
+          $addToSet: {
+            likedShops: {
+              idShop: idshop
+            }
           }
         }
-      },
-      function(err, result) {
-        if (result) {
-          callback("Updated: shop liked " + result);
-        } else {
-          let reponse = { error: err, msg: "Error: can't update the user " };
-          callback(reponse);
-        }
-      }
-    );
-  } else {
-    let reponse = {
-      error: err,
-      msg: "Error: error in geting the user collection."
-    };
-    callback(reponse);
-  }
+      )
+      .then(result => {
+        callback({
+          msg: "Updated",
+          result: result
+        });
+      })
+      .catch(err => {
+        throw err;
+      });
+  });
 };
-
 //disliking a shop
 exports.dislikeShop = async function(iduser, idshop, callback) {
-  const Collection = await GetCollection("users");
-  if (Collection) {
-    await Collection.update(
-      { _id: ObjectId(iduser) },
-      {
-        $addToSet: {
-          dislikedShops: {
-            idShop: idshop,
-            date: Date.now()
+  MongoClient.connect(url).then(client => {
+    client
+      .db(dbName)
+      .collection("users")
+      .update(
+        { _id: ObjectId(iduser) },
+        {
+          $addToSet: {
+            dislikedShops: {
+              idShop: idshop,
+              date: Date.now()
+            }
           }
         }
-      },
-      function(err, result) {
-        if (!err) {
-          callback("Updated: shop disliked " + result);
-        } else {
-          const reponse = {
-            error: err,
-            msg: "Error: can't update the user "
-          };
-          callback(reponse);
-        }
-      }
-    );
-  } else {
-    const reponse = (reponse = {
-      error: err,
-      msg: "Error: error in geting the user collection."
-    });
-    callback(reponse);
-  }
+      )
+      .then(result => {
+        callback({
+          msg: "Updated",
+          result: result
+        });
+      })
+      .catch(err => {
+        throw err;
+      });
+  });
 };
 
 //removing a like from a shop
 exports.removeShop = async function(iduser, idshop, callback) {
-  const Collection = await GetCollection("users");
-  let reponse;
-  if (Collection) {
-    await Collection.update(
-      { _id: ObjectId(iduser) },
-      {
-        $pull: { likedShops: { idShop: idshop } }
-      },
-      function(err, result) {
-        if (result) {
-          callback("Updated: shop removed " + result);
-        } else {
-          reponse = { error: err, msg: "Error: can't find the liked shop " };
+  MongoClient.connect(url).then(client => {
+    client
+      .db(dbName)
+      .collection("shops")
+      .update(
+        { _id: ObjectId(iduser) },
+        { $pull: { likedShops: { idShop: idshop } } }
+      )
+      .then(result =>
+        callback({
+          msg: "Updated",
+          result: result
+        })
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+};
+
+exports.findShopliked = function(iduser, callback) {
+  MongoClient.connect(url).then(async client => {
+    const db = client.db(dbName);
+    // finding liked shops of the user
+    db.collection("users")
+      .findOne({ _id: ObjectId(iduser) })
+      .then(data => {
+        const arrayid = [];
+
+        if (data.likedShops) {
+          data.likedShops.forEach(shop => {
+            // putting ids in an array of ObjectId
+            arrayid.push(new ObjectId(shop.idShop));
+          });
         }
-        callback(reponse);
-      }
-    );
-  } else {
-    reponse = { error: err, msg: "Error: error in geting the user collection" };
-    callback(reponse);
-  }
-};
-
-//finding liked shops
-exports.findShopliked = async function(iduser, callback) {
-  const CollectionS = await GetCollection("shops");
-  if (CollectionS) {
-    getLikedShopsIds(iduser, async results => {
-      if (results.message) {
-        callback(results);
-      } else {
-        //finding the shops objects in shops collection
-        await CollectionS.find({ _id: { $in: results } }).toArray(
-          (err, data) => {
-            if (data) {
-              callback(data);
-            } else {
-              let reponse = {
-                error: err,
-                msg: "error : can't get list of liked shops"
-              };
-              callback(reponse);
+        return arrayid;
+      })
+      //finding the shops objects in shops collection
+      .then(results => {
+        db.collection("shops")
+          .find({
+            _id: {
+              $in: results
             }
-          }
-        );
-      }
-    });
-  } else {
-    let reponse = { error: err, msg: "error : can't get shops collection " };
-    callback(reponse);
-  }
-};
-
-//finding unliked shops
-exports.findShopunliked = async function(iduser, callback) {
-  const CollectionS = await GetCollection("shops");
-  if (CollectionS) {
-    getLikedShopsIds(iduser, async results => {
-      if (results.message) {
-        // if there is an error message
-        callback(results);
-      } else {
-        //finding the shops objects in shops collection
-        await CollectionS.find({ _id: { $nin: results } }).toArray(
-          (err, data) => {
-            if (data) {
-              callback(data);
-            } else {
-              let reponse = {
-                error: err,
-                msg: "error : can't get list of shops"
-              };
-              callback(reponse);
-            }
-          }
-        );
-      }
-    });
-  } else {
-    let reponse = { error: err, msg: "error : can't get shops collection" };
-    callback(reponse);
-  }
-};
-
-//finding unliked Near shops
-exports.findShopunlikedNear = async function(coord, iduser, callback) {
-  const CollectionS = await GetCollection("shops");
-  if (CollectionS) {
-    getLikedShopsIds(iduser, async results => {
-      if (results.message) {
-        // if there is an error message
-        callback(results);
-      } else {
-        //finding near unliked shops objects in shops collection sorted by distance withing 10000 m
-        await CollectionS.aggregate([
-          {
-            $geoNear: {
-              near: {
-                type: "Point",
-                coordinates: [parseFloat(coord.lng), parseFloat(coord.lat)]
-              },
-              spherical: true,
-              distanceField: "distance",
-              maxDistance: 10000
-            }
-          },
-          { $match: { _id: { $nin: results } } }
-        ]).get((err, data) => {
-          if (data) {
+          })
+          .toArray()
+          .then(data => {
             callback(data);
-          } else {
-            reponse = {
-              error: err,
-              msg: "error : can't get list of near shops"
-            };
-            callback(reponse);
-          }
-        });
-      }
-    });
-  }
+          });
+      });
+  });
 };
 
 //finding unliked shops
-//10000m Near
+//40km Near
 //and not disliked in 2 hours
-
-exports.findShopunlikedNearNOTdisliked = async function(
-  coord,
-  iduser,
-  callback
-) {
-  const CollectionS = await GetCollection("shops");
-  if (CollectionS) {
-    //liked shops
-    getLikedShopsIds(iduser, async resultsliked => {
-      if (resultsliked.error) {
-        // if there is an error message
-        callback(resultsliked);
-      } else {
-        //disliked shops
-        getdislikedShopsIn2hours(iduser, async resultsdisliked => {
-          if (resultsdisliked.error) {
-            // if there is an error message
-            callback(resultsdisliked);
-          } else {
-            //finding near unliked not disliked shops objects in shops collection sorted by distance withing 10000 m
-            await CollectionS.aggregate([
-              {
-                $geoNear: {
-                  near: {
-                    type: "Point",
-                    coordinates: [parseFloat(coord.lng), parseFloat(coord.lat)]
-                  },
-                  spherical: true,
-                  distanceField: "distance",
-                  maxDistance: 10000
-                }
-              },
-              { $match: { _id: { $nin: resultsdisliked } , _id: { $nin: resultsliked } } } // unliked shops
-            ]).get((err, data) => {
-              if (data) {
-                callback(data);
-              } else {
-                reponse = {
-                  error: err,
-                  msg: "error : can't get list of near shops"
-                };
-                callback(reponse);
+exports.findShopsHome = function(coord, iduser, callback) {
+  MongoClient.connect(url).then(client => {
+    const db = client.db(dbName);
+    db.collection("users")
+      .findOne({ _id: ObjectId(iduser) })
+      .then(user => {
+        const idliked = [];
+        const iddisliked = [];
+        // finding liked shops of the user
+        if (user.likedShops) {
+          user.likedShops.forEach(shop => {
+            idliked.push(new ObjectId(shop.idShop));
+          });
+        }
+        // finding disliked shops in 2 hours of the user
+        if (user.dislikedShops) {
+          user.dislikedShops.forEach(shop => {
+            if (liked2hours(shop.date)) {
+              iddisliked.push(new ObjectId(shop.idShop));
+            }
+          });
+        }
+    
+        //finding near shops
+        db.collection("shops")
+          .aggregate([
+            {
+              $geoNear: {
+                near: {
+                  type: "Point",
+                  coordinates: [parseFloat(coord.lng), parseFloat(coord.lat)]
+                },
+                spherical: true,
+                distanceField: "distance",
+                maxDistance: 40000
               }
-            });
-          }
-        });
-      }
-    });
-  }
+            },
+            {
+              $match: {
+                _id: { $nin: iddisliked },
+                _id: { $nin: idliked },
+                // 
+              }
+            }
+          ])
+          .get().then(data => {
+            
+              callback(data);
+            
+          });
+      })
+      .catch(err => {
+        throw err;
+      });
+  });
 };
-
-// exports.deleteuser = function(id, callback) {
-//   MongoClient.connect(
-//     url,
-//     function(err, client) {
-//       var db = client.db(dbName);
-
-//       if (!err) {
-//         let myquery = { _id: ObjectId(id) };
-
-//         db.collection("users").deleteOne(myquery, function(err, result) {
-//           if (!err) {
-//             reponse = {
-//               succes: true,
-//               result: result,
-//               error: null,
-//               msg: "Suppression réussie " + result
-//             };
-//           } else {
-//             reponse = {
-//               succes: false,
-//               error: err,
-//               msg: "Problème à la suppression"
-//             };
-//           }
-//           callback(reponse);
-//         });
-//       } else {
-//         let reponse = (reponse = {
-//           succes: false,
-//           error: err,
-//           msg: "Problème lors de la suppression, erreur de connexion."
-//         });
-//         callback(reponse);
-//       }
-//     }
-//   );
-//
-// };
 
 function TestPasword() {
   let errors = [];
@@ -384,87 +261,23 @@ function TestPasword() {
   return errors;
 }
 
-async function getLikedShopsIds(iduser, callback) {
-  const CollectionU = await GetCollection("users");
-  // finding ids of liked shops
-  await CollectionU.findOne(
-    { _id: ObjectId(iduser) },
-    { "likedShops.idShop": 1 },
-    async (err, data) => {
-      if (data) {
-        if (data.likedShops) {
-          let arrayid = [];
-          // putting them in an array of ObjectId
-          data.likedShops.forEach(shop => {
-            arrayid.push(new ObjectId(shop.idShop));
-          });
-          callback(arrayid);
-        } else {
-          callback({
-            message: "error : no liked shops"
-          });
-        }
-      } else {
-        callback({ error: err, message: "error : can't get info of the user" });
-      }
-    }
-  );
+function liked2hours(THEdate) {
+  let DislikedDate = new Date(THEdate);
+  let nowDate = new Date(Date.now());
+  // disliked today
+  if (
+    DislikedDate.withoutTime().getTime() === nowDate.withoutTime().getTime()
+  ) {
+    if (Math.floor((nowDate - DislikedDate) / 60e3) < 120) {
+      // less than 2 hours
+      return true;
+    } else return false;
+  }
 }
-//$hour
-async function getdislikedShopsIn2hours(iduser, callback) {
-  const CollectionU = await GetCollection("users");
-  // finding ids of disliked shops
-  await CollectionU.findOne(
-    { _id: ObjectId(iduser) },
-    { "dislikedShops.date": 1 },
-    (err, data) => {
-      if (data) {
-        if (data.dislikedShops) {
-          let arrayid = [];
-          //getting the last disliked shops in two hours
-          data.dislikedShops.forEach(shop => {
-            let dD = new Date(shop.date); //dD disliked Date
-            let nD = new Date(Date.now()); //nD now Date
-            // disliked today
-            if (dD.withoutTime().getTime() === nD.withoutTime().getTime()) { 
-            // 120 minutes  == 2 hours  
-            if (Math.floor((nD - dD) / 60e3) < 120)
-                // putting them in an array of ObjectId
-                arrayid.push(new ObjectId(shop.idShop));
-            }
-          });
-          callback(arrayid);
-        }
-        else {
-          callback({
-            message: "error : no disliked shops withing two hours "
-          });
-        }
-      } else {
-        reponse = {
-          error: err,
-          msg: "error : can't get info of the user"
-        };
-        callback(reponse);
-      }
-    }
-  );
-}
-
 Date.prototype.withoutTime = function() {
   var d = new Date(this);
   d.setHours(0, 0, 0, 0);
   return d;
 };
 
-async function GetCollection(name) {
-  const client = await mongodb.MongoClient.connect(
-    "mongodb://kaolaa:kaola77@ds141924.mlab.com:41924/shops",
-    {
-      useNewUrlParser: true
-    }
-  );
-
-  return client.db(dbName).collection(name);
-}
 module.exports = exports;
