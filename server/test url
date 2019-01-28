@@ -21,3 +21,6 @@ http://localhost:2000/api/users/near?iduser=5c1fabedea128e363cd32195&lng=-6.7930
 
 //liked
 http://localhost:2000/api/users/liked?iduser=5c1fabedea128e363cd32195
+
+//disliked 
+http://localhost:2000/api/users/disliked?iduser=5c1fabedea128e363cd32195

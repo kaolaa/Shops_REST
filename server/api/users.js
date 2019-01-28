@@ -59,7 +59,7 @@ router.get('/like', function(req, res) {
 });
 
 //remove a liked shop 
-router.get('/remove', function(req, res) {
+router.get('/removelike', function(req, res) {
 	var iduser = req.query.iduser;
 	var idshop = req.query.idshop;
 
@@ -82,7 +82,7 @@ router.get('/dislike', function(req, res) {
 
 
 // find unliked shops
-router.get('/noliked', function(req, res) {
+router.get('/disliked', function(req, res) {
   var iduser = req.query.iduser;
   
  	userCRUD.findShopunliked(iduser, function(data) {

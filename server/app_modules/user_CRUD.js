@@ -132,12 +132,15 @@ exports.dislikeShop = async function(iduser, idshop, callback) {
 //removing a like from a shop
 exports.removeShop = async function(iduser, idshop, callback) {
   MongoClient.connect(url).then(client => {
+    console.log(iduser + " " +idshop );
     client
       .db(dbName)
-      .collection("shops")
-      .update(
+      .collection("users")
+      .updateOne(
         { _id: ObjectId(iduser) },
-        { $pull: { likedShops: { idShop: idshop } } }
+        { $pull: { likedShops: {
+          idShop: idshop
+      } } }
       )
       .then(result =>
         callback({
@@ -183,7 +186,38 @@ exports.findShopliked = function(iduser, callback) {
       });
   });
 };
+exports.findShopunliked = async function(iduser, callback) {
+  MongoClient.connect(url).then(async client => {
+    const db = client.db(dbName);
+    // finding liked shops of the user
+    db.collection("users")
+      .findOne({ _id: ObjectId(iduser) })
+      .then(data => {
+        const arrayid = [];
 
+        if (data.dislikedShops) {
+          data.dislikedShops.forEach(shop => {
+            // putting ids in an array of ObjectId
+            arrayid.push(new ObjectId(shop.idShop));
+          });
+        }
+        return arrayid;
+      })
+      //finding the shops objects in shops collection
+      .then(results => {
+        db.collection("shops")
+          .find({
+            _id: {
+              $in: results
+            }
+          })
+          .toArray()
+          .then(data => {
+            callback(data);
+          });
+      });
+  });
+};
 //finding unliked shops
 //40km Near
 //and not disliked in 2 hours
@@ -227,7 +261,13 @@ exports.findShopsHome = function(coord, iduser, callback) {
             {
               $match: {
                 _id: { $nin: iddisliked },
-                _id: { $nin: idliked },
+                // _id: { $nin: idliked },
+                // 
+              }
+            },
+            {
+              $match: {
+                 _id: { $nin: idliked },
                 // 
               }
             }
