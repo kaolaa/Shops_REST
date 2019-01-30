@@ -22,6 +22,7 @@ Bonus point:
 
 
 ##Requirements
+
  - [Node js](https://nodejs.org/en/)
  - [MongoDB](https://github.com/mongodb/mongo)
  - [Vue CLI](https://github.com/vuejs/vue-cli)
@@ -29,7 +30,9 @@ Bonus point:
 ## FrontEnd part
 
 [link to the frontend repository](https://github.com/kaolaa/Shops_Client) 
+
 ####Built with 
+
 - [Vue](https://github.com/vuejs/vue) 
 - [Vue CLI](https://github.com/vuejs/vue-cli)
 - [Vuex](https://github.com/vuejs/vuex) 
@@ -38,37 +41,38 @@ Bonus point:
 ## BackEnd part (API)
 
 ####Built with 
+
 - [Nodejs](https://nodejs.org/en/)
 - [Express.js](https://github.com/expressjs/express)
 - [MongoDB](https://github.com/mongodb/mongo)
 
 ## Deploy
 
-##### First part
+#### First part
 - Open the terminal
 - run "git clone https://github.com/kaolaa/Shops_REST.git"
 - Navigate to the project
 - Run `npm install` or `yarn install` if you use [Yarn](https://yarnpkg.com/en/)
 - And `npm start`
+
 📣 After running the commands the server will be alive on http://localhost:2000.
-✨ The file /                 ,containt  some exemples to test the api.
-            ├── server
-            │   ├── test url
+✨ The file '/server/test url' ,containt  some exemples to test the api.
+           
 
-
-##### Second part
+#### Second part
 In a new project or folder terminal :
 - Run `git clone https://github.com/kaolaa/Shops_Client.git` 
 - Run `npm install` or `yarn install` if you use [Yarn](https://yarnpkg.com/en/)
-- And finnaly  `npm run serve`
+- And finaly  `npm run serve`
+
 📣 The friendly interface will show up on http://localhost:8080.
 
-##### The Database (mongodb)
+#### The Database (mongodb)
 The database is stored in [mlab](https://mlab.com/), there's a direct link inside the project to get access to all the data used to run the project
 
 
 ## Template
-i've used part of [Vuemmerce](https://github.com/ivanlori/Vuemmerce) template to gain some time on the UX/UI part.
+I've used parts of [Vuemmerce](https://github.com/ivanlori/Vuemmerce) template to gain some time on the UX/UI part.
 
 
 
