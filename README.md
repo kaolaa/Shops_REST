@@ -28,11 +28,9 @@ Bonus point:
  - [Vue CLI](https://github.com/vuejs/vue-cli)
 
 ## FrontEnd part
+[Link to the frontend repository](https://github.com/kaolaa/Shops_Client) 
 
-[link to the frontend repository](https://github.com/kaolaa/Shops_Client) 
-
-####Built with 
-
+#### Built with 
 - [Vue](https://github.com/vuejs/vue) 
 - [Vue CLI](https://github.com/vuejs/vue-cli)
 - [Vuex](https://github.com/vuejs/vuex) 
@@ -40,8 +38,7 @@ Bonus point:
 
 ## BackEnd part (API)
 
-####Built with 
-
+#### Built with 
 - [Nodejs](https://nodejs.org/en/)
 - [Express.js](https://github.com/expressjs/express)
 - [MongoDB](https://github.com/mongodb/mongo)
@@ -49,7 +46,6 @@ Bonus point:
 ## Deploy
 
 #### First part
-
 - Open the terminal
 - run "git clone https://github.com/kaolaa/Shops_REST.git"
 - Navigate to the project
@@ -60,8 +56,8 @@ Bonus point:
 
 ✨ The file '/server/test url' ,containt  some exemples to test the api.
            
-#### Second part
 
+#### Second part
 In a new project or folder terminal :
 - Run `git clone https://github.com/kaolaa/Shops_Client.git` 
 - Run `npm install` or `yarn install` if you use [Yarn](https://yarnpkg.com/en/)
