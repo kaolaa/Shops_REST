@@ -49,6 +49,7 @@ Bonus point:
 ## Deploy
 
 #### First part
+
 - Open the terminal
 - run "git clone https://github.com/kaolaa/Shops_REST.git"
 - Navigate to the project
@@ -56,10 +57,11 @@ Bonus point:
 - And `npm start`
 
 📣 After running the commands the server will be alive on http://localhost:2000.
+
 ✨ The file '/server/test url' ,containt  some exemples to test the api.
            
-
 #### Second part
+
 In a new project or folder terminal :
 - Run `git clone https://github.com/kaolaa/Shops_Client.git` 
 - Run `npm install` or `yarn install` if you use [Yarn](https://yarnpkg.com/en/)
