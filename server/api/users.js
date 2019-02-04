@@ -48,7 +48,7 @@ router.post("/singin", function(req, res, next) {
 /************************ FUNCTION IN SHOPS *************************/
 
 //like a shop 
-router.get('/like', function(req, res) {
+router.post('/like', function(req, res) {
 	var iduser = req.query.iduser;
 	var idshop = req.query.idshop;
 
@@ -59,7 +59,7 @@ router.get('/like', function(req, res) {
 });
 
 //remove a liked shop 
-router.get('/removelike', function(req, res) {
+router.delete('/removelike', function(req, res) {
 	var iduser = req.query.iduser;
 	var idshop = req.query.idshop;
 
@@ -70,7 +70,7 @@ router.get('/removelike', function(req, res) {
 });
 
 //dislike a shop 
-router.get('/dislike', function(req, res) {
+router.post('/dislike', function(req, res) {
 	var iduser = req.query.iduser;
 	var idshop = req.query.idshop;
 
