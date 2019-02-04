@@ -20,6 +20,9 @@ Bonus point:
     [BONUS] As a User, I can display the list of preferred shops ✔️
     [BONUS] As a User, I can remove a shop from my preferred shops list ✔️
 
+To test the diffrent parts of the project you can use the following account :
+> Email : test@gmail.com    
+> Password : 123
 
 ## 🃏Requirements
 
@@ -67,6 +70,8 @@ In a new project or folder terminal :
 
 #### The Database (mongodb)
 The database is stored in [mlab](https://mlab.com/), there's a direct link inside the project to get access to all the data used to run the project
+
+
 
 
 ## 📐Template
