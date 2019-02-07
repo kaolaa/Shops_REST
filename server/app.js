@@ -9,6 +9,16 @@ const app = express();
 //Middleware
 app.use(bodyParser.json());
 app.use(cors());
+
+// Passport config 
+require('./conf/passport')(passport);
+ 
+const shops = require('./api/shops');
+app.use('/api/shops',shops);
+
+const users = require('./api/users');
+app.use('/api/users',users); 
+
 // handle production
 if(process.env.NODE_ENV === 'production'){
     //static folder
@@ -18,14 +28,7 @@ if(process.env.NODE_ENV === 'production'){
 
 }
 
-// Passport config 
-require('./conf/passport')(passport);
- 
-const shops = require('./api/shops');
-app.use('/api/shops',shops);
 
-const users = require('./api/users');
-app.use('/api/users',users);
 
 const port = process.env.PORT || 2000;
 
