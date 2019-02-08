@@ -61,6 +61,8 @@ To test the diffrent parts of the project you can use the following account :
 📣 After running the commands the server will be alive on http://localhost:2000.
 
 ✨ The file '/server/test url' ,containt  some exemples to test the api.
+✨ The folder '/server/public' is the front end part for production, created to publish the full project too heroku, however it's the exact same code as [the frontend project](https://github.com/kaolaa/Shops_Client) 
+
            
 
 #### Second part
