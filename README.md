@@ -6,7 +6,7 @@ A project made with love and so much passion built over [Vue js](https://github.
 
 Managing Nearby shops, the website present all the near shop from the database that are near the current localisation of the user. After login in, a user can like or dislike a shop, remove a shop from the liked ones and hide a shop from the homepage for 2 hours.
 
-## 📑The Functional specification covered
+## 📑The User stories covered
 
     As a User, I can sign up using my email & password ✔️
     As a User, I can sign in using my email & password ✔️
@@ -19,6 +19,10 @@ Bonus point:
     [BONUS] As a User, I can dislike a shop, so it won’t be displayed within “Nearby Shops” list during the next 2 hours ✔️
     [BONUS] As a User, I can display the list of preferred shops ✔️
     [BONUS] As a User, I can remove a shop from my preferred shops list ✔️
+
+## 🎥Demo
+### Heroku
+The following link present a live demo of the work [DEMO](https://morning-garden-71217.herokuapp.com) 
 
 To test the diffrent parts of the project you can use the following account :
 > Email : test@gmail.com    
@@ -47,7 +51,6 @@ To test the diffrent parts of the project you can use the following account :
 - [MongoDB](https://github.com/mongodb/mongo)
 
 ## ⚡Deploy
-
 #### First part
 - Open the terminal
 - run "git clone https://github.com/kaolaa/Shops_REST.git"
@@ -67,6 +70,9 @@ In a new project or folder terminal :
 - And finaly  `npm run serve`
 
 📣 The friendly interface will show up on http://localhost:8080.
+
+#### 🚨Note 
+You need to have the server still runing to be able to test the front part .
 
 #### The Database (mongodb)
 The database is stored in [mlab](https://mlab.com/), there's a direct link inside the project to get access to all the data used to run the project
